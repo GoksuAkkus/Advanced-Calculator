@@ -1,0 +1,424 @@
+
+package com.example.kontess.advancedcalculator;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import java.util.Stack;
+
+import static java.sql.Types.NULL;
+
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText islem;
+    TextView post,in,sonuc;
+    Button btn;
+
+    String giris="";
+
+
+
+    Double dizisi[]=new Double[50];
+    String Postfix[]=new String[50];
+    String Infix[] = new String[50];
+
+    int k=0;
+    char array[]=new char[5];
+    int i=0;
+    int a=0;
+    int p=0;
+    int j=0;
+    int s=0;
+    int ss=0;
+    int pp=0;
+    int anan=0;
+
+    String Stack[]=new String[50];
+    Double doubleStack[]=new Double[50];
+    int intdizi[]=new int[50];
+    Stack b=new Stack();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        btn=(Button)findViewById(R.id.button2);
+        islem=(EditText)findViewById(R.id.txt_islem);
+        post=(TextView)findViewById(R.id.lbl_postfix);
+        in=(TextView)findViewById(R.id.lbl_infix);
+        sonuc=(TextView)findViewById(R.id.lbl_sonuc);
+
+        giris=islem.getText().toString();
+
+
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                 // Girilen deðeri iþlem stringine attýk.
+
+                //Bu stringin elemanlarýný tek tek gezip operandlarýna ayýrýcaz.
+
+                for(i=0;i<giris.length();i++)
+                {
+
+                    p=0;
+                    if(IsOperand(giris.charAt(i)))
+                    {
+                        array[a] = giris.charAt(i);
+                        a++;
+
+                    }
+
+                    else
+                    {
+                        a=0;
+
+                        if(array[0]!=NULL)
+                        {
+                           Infix[k]=new String(array);
+                            //dizisi[k]=new Double(array[i];
+                            k++;
+                            p=0;
+
+                            while(array[p]!=NULL)
+                            {
+                                array[p]=NULL;
+                                p++;
+                            }
+
+
+                        }
+
+                        Infix[k] = String.valueOf(giris.charAt(i));
+                        //dizisi[k]=Double.valueOf(giris.charAt(i));
+
+                        k++;
+
+                    }
+
+
+
+                }
+
+
+                    if (array[0]!=NULL)
+                    {
+                        Infix[k]=new String(array);
+                        //dizisi[k]=Double.valueOf(array.toString());
+                        k++;
+                        int p=0;
+                        while(array[p]!=NULL)
+                        {
+                            array[p]=0;
+                            p++;
+                        }
+                    }
+
+
+                while(Infix[anan]!=null)
+                {
+                    if(IsOperand(Infix[anan].charAt(0)))
+                    {
+                        dizisi[anan] = Double.valueOf(Infix[anan]);
+                        Infix[anan]=String.valueOf(dizisi[anan]);
+                        //dizisi[anan]=Infix[anan].replaceAll("'\u0000' 0","");
+                    }
+                    else
+                    {
+                        //dizisi[anan]=Double.valueOf(Infix[anan].toString());
+                    }
+                    anan++;
+                }
+                //int g=4;
+                //char s=Infix[0].charAt(4);
+
+
+                while(Infix[j]!=null)
+                {
+                    if (Infix[j].length() > 1) //OPERANDDIR
+                    {
+                        Postfix[p]=Infix[j];
+                        p++;
+                        //i++;
+                    }
+                    else if(Infix[j].charAt(0)==')')  //AÇIK PARANTEZÝ GÖRENE KADAR STACKTEKÝLERÝ POP EDÝCEK
+                    {
+                        //i++;
+                        while(Stack[s-1].charAt(0)!='(')
+                        {
+                            Postfix[p]=Stack[s-1];
+                            //Postfix[p]=b.pop().toString();
+                            p++;
+                            s--;
+                            b.pop();
+                            if(s==0)
+                            {
+                                break;
+                            }
+                        }
+
+                        if(Stack[s-1].charAt(0)=='(')
+                        {
+                            s--;
+                            b.pop();
+
+                        }
+                    }
+                    else if(Infix[j].charAt(0)=='(')
+                    {
+                        Stack[s]=Infix[j];
+                        s++;
+                        b.push(Infix[j]);
+                        //i++;
+                    }
+                    else if(Infix[j].length()==1)
+                    {
+                        if (IsOperand(Infix[j].charAt(0)))
+                        {
+                            Postfix[p] = Infix[j];  //OPERANDLARLA ÝÞÝMÝZ BÝTTÝ
+                            p++;
+
+                        }
+
+                        else if (IsOperator(Infix[j].charAt(0)) && Infix[j].charAt(0) != ')' && Infix[j].charAt(0) != '(')
+                        {
+                            //operatördür stacke yazýlmalý
+                            //KAPA PARANTEZ FARKLI ÝÞLÝCEM
+
+                            //b.push(In[i].charAt(0));
+
+                            if (IsStackEmpty(b))  //EÐER STACK BOÞSA VE GELEN OPERATÖRSE
+                            {
+                                Stack[s] = Infix[j];
+                                s++;
+                                b.push(Infix[j]);
+                                //i++;
+                            } else if (!IsStackEmpty(b)) //EÐER STACK BOÞ DEÝLSE VE GELEN OPERATÖRSE ÖNCELÝKLERE BAKICAZ
+                            {
+                                while (Oncelik(Infix[j].charAt(0)) >= Oncelik(Stack[s - 1].charAt(0)) && Infix[j].charAt(0) != ')' && Infix[j].charAt(0) != '(') {
+                                    Postfix[p] = Stack[s - 1];
+                                    s--;
+                                    p++;
+                                    b.pop();
+
+                                    if (s == 0) {
+                                        break;
+                                    }
+
+
+                                }
+                                Stack[s] = Infix[j];
+                                s++;
+                                b.push(Infix[j]);
+                                //i++;
+                            }
+
+                        }
+
+
+                    }
+
+
+                    j++;
+
+                }
+                s--;
+
+
+                /*if(!b.empty())
+                {
+                    while(Stack[s]!=null )
+                    {
+                        Postfix[p] = Stack[s];
+                        s--;
+                    }
+                }*/
+
+                while(!b.empty())
+                {
+                    Postfix[p]=Stack[s];
+                    s--;
+                    b.pop();
+                }
+
+                int bktm=0;
+                /*while(Postfix[bktm]!=null)
+                {
+                    if(IsOperand(Postfix[bktm].charAt(0)))
+                    {
+                       intdizi[bktm]=Integer.valueOf(Postfix[bktm]);
+
+                        //dizisi[anan]=Infix[anan].replaceAll("'\u0000' 0","");
+                    }
+                    else
+                    {
+                        //dizisi[anan]=Double.valueOf(Infix[anan].toString());
+                    }
+                    bktm++;
+                }*/
+                int y=0;
+                while(Postfix[y]!=null)
+                {
+                    post.setText(""+post.getText() + Postfix[y]);
+                    y++;
+                }
+
+                /*for(int h=0;h<intdizi.length;h++)
+                {
+                    intdizi[h]= new Integer(Postfix[h]);
+                }*/
+
+
+                while(Postfix[pp]!=null)
+                {
+                    if(IsOperand(Postfix[pp].charAt(0))) //Operandsa stacke atýcaz.
+                    {
+                        doubleStack[ss]=Double.valueOf(Postfix[pp]);
+                        ss++;
+                    }
+                    else
+                    {
+                        if(Postfix[pp].charAt(0)=='*')
+                        {
+                            doubleStack[ss-2]=carp(doubleStack[ss-1],doubleStack[ss-2]);
+                            ss--;
+                        }
+                        else  if(Postfix[pp].charAt(0)=='/')
+                        {
+                            doubleStack[ss-2]=bol(doubleStack[ss-1],doubleStack[ss-2]);
+                            ss--;
+                        }
+                        else  if(Postfix[pp].charAt(0)=='+')
+                        {
+                            doubleStack[ss-2]=topla(doubleStack[ss-1],doubleStack[ss-2]);
+                            ss--;
+                        }
+                        else  if(Postfix[pp].charAt(0)=='-')
+                        {
+                            doubleStack[ss-2]=cikar(doubleStack[ss-1],doubleStack[ss-2]);
+                            ss--;
+
+                        }
+
+
+                    }
+                    pp++;
+
+                }
+
+                    sonuc.setText(""+sonuc.getText() + doubleStack[0]);
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+        });
+
+    }
+
+
+
+
+    double carp(double sayi1,double sayi2)
+    {
+        return sayi1*sayi2;
+    }
+    double bol(double sayi1,double sayi2)
+    {
+        return sayi2/sayi1;
+    }
+    double topla(double sayi1,double sayi2)
+    {
+        return sayi1+sayi2;
+    }
+    double cikar(double sayi1,double sayi2)
+    {
+        return sayi2-sayi1;
+    }
+
+    /*public boolean StringIsOperand(String ch[])
+    {
+        if(ch[1]=='+' || ch=='-' || ch=='/' || ch=='*' || ch=='(' || ch==')' )
+        {
+            return true;
+        }
+        else
+            return false;
+    }*/
+
+    public boolean IsStackEmpty(Stack st)
+    {
+        if(st.empty())
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
+
+    public int Oncelik(char ch)
+    {
+        if(ch=='(')
+        {
+            return 3;
+        }
+        if(ch=='*' || ch=='/')
+        {
+            return 1;
+        }
+        if(ch=='+' || ch=='-')
+        {
+            return 2;
+        }
+
+        else
+            return -1;
+    }
+
+
+    public boolean IsOperator(char ch)
+    {
+        if(ch=='+' || ch=='-' || ch=='/' || ch=='*' || ch=='(' || ch==')' )
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public boolean IsOperand(char ch)
+    {
+        int nah;
+        if(ch>=48 && ch<=57)
+        {
+            nah=1;
+            return true;
+        }
+        else
+        {
+            nah=2;
+            return false;
+        }
+
+
+    }
+
+
+}
